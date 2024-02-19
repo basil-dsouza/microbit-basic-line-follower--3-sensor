@@ -1,30 +1,75 @@
+def Update_Sensor():
+    global left_sensor, middle_sensor, right_sensor
+    if True:
+        left_sensor = pins.digital_read_pin(DigitalPin.P0)
+        middle_sensor = pins.digital_read_pin(DigitalPin.P1)
+        right_sensor = pins.digital_read_pin(DigitalPin.P2)
+    else:
+        left_sensor = pins.digital_read_pin(DigitalPin.P12)
+        middle_sensor = pins.digital_read_pin(DigitalPin.P1)
+        right_sensor = pins.digital_read_pin(DigitalPin.P13)
+"""
+
+THICK / THIN
+
+"""
 prev_direction = ""
+prev_display_direction = ""
 start_time = 0
 direction = ""
+right_sensor = 0
+middle_sensor = 0
+left_sensor = 0
 line_follower = True
+line_size = "THICK"
 speed_fast = 255
 speed_slow = 100
+speed = 255
 speed_turn_offset = 50
 serial.redirect_to_usb()
 
 def on_forever():
+    global prev_display_direction
+    if prev_display_direction != direction:
+        prev_display_direction = direction
+        if direction == "FORWARD":
+            basic.show_arrow(ArrowNames.NORTH)
+        elif direction == "REVERSE":
+            basic.show_arrow(ArrowNames.SOUTH)
+        elif direction == "ROTATE_CLOCKWISE":
+            basic.show_arrow(ArrowNames.NORTH_WEST)
+        elif direction == "ROTATE_COUNTERCLOCKWISE":
+            basic.show_arrow(ArrowNames.NORTH_EAST)
+        elif direction == "TRAVERSE_LEFT":
+            basic.show_arrow(ArrowNames.EAST)
+        elif direction == "TRAVERSE_RIGHT":
+            basic.show_arrow(ArrowNames.WEST)
+        elif direction == "STOP":
+            basic.show_icon(IconNames.CHESSBOARD)
+
+basic.forever(on_forever)
+
+# Use: FORWARD / REVERSE / TRAVERSE_LEFT / TRAVERSE_RIGHT / ROTATE_CLOCKWISE / ROTATE_COUNTERCLOCKWISE / STOP
+
+def on_forever2():
     global direction
     if line_follower:
-        if pins.digital_read_pin(DigitalPin.P1) == 1:
+        if middle_sensor == 1:
             direction = "FORWARD"
-        elif pins.digital_read_pin(DigitalPin.P2) == 1:
+        elif right_sensor == 1:
             direction = "ROTATE_CLOCKWISE"
-        elif pins.digital_read_pin(DigitalPin.P0) == 1:
+        elif left_sensor == 1:
             direction = "ROTATE_COUNTERCLOCKWISE"
         else:
             direction = "STOP"
-basic.forever(on_forever)
+basic.forever(on_forever2)
 
-def on_forever2():
+# Advanced - Can Ignore for now
+
+def on_forever3():
     global start_time, prev_direction
     start_time = control.millis()
     if prev_direction != direction:
-        speed = 0
         prev_direction = direction
         serial.write_line("Direction:" + direction)
         if direction == "FORWARD":
@@ -77,4 +122,4 @@ def on_forever2():
             motor.motor_stop_all()
         else:
             motor.motor_stop_all()
-basic.forever(on_forever2)
+basic.forever(on_forever3)
