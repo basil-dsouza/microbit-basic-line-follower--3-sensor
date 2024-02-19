@@ -1,17 +1,30 @@
-direction = ""
 prev_direction = ""
 start_time = 0
+direction = ""
+line_follower = True
 speed_fast = 255
 speed_slow = 100
 speed_turn_offset = 50
-speed = 0
-line_follower = False
 serial.redirect_to_usb()
 
 def on_forever():
+    global direction
+    if line_follower:
+        if pins.digital_read_pin(DigitalPin.P1) == 1:
+            direction = "FORWARD"
+        elif pins.digital_read_pin(DigitalPin.P2) == 1:
+            direction = "ROTATE_CLOCKWISE"
+        elif pins.digital_read_pin(DigitalPin.P0) == 1:
+            direction = "ROTATE_COUNTERCLOCKWISE"
+        else:
+            direction = "STOP"
+basic.forever(on_forever)
+
+def on_forever2():
     global start_time, prev_direction
     start_time = control.millis()
     if prev_direction != direction:
+        speed = 0
         prev_direction = direction
         serial.write_line("Direction:" + direction)
         if direction == "FORWARD":
@@ -62,22 +75,6 @@ def on_forever():
             motor.motor_run(motor.Motors.M4, motor.Dir.CW, speed)
         elif direction == "STOP":
             motor.motor_stop_all()
-        elif direction == "\"HORN\"":
-            music.play(music.tone_playable(262, music.beat(BeatFraction.BREVE)),
-                music.PlaybackMode.IN_BACKGROUND)
         else:
             motor.motor_stop_all()
-basic.forever(on_forever)
-
-def on_forever2():
-    global direction
-    if line_follower:
-        if pins.digital_read_pin(DigitalPin.P1) == 1:
-            direction = "FORWARD"
-        elif pins.digital_read_pin(DigitalPin.P2) == 1:
-            direction = "ROTATE_CLOCKWISE"
-        elif pins.digital_read_pin(DigitalPin.P0) == 1:
-            direction = "ROTATE_COUNTERCLOCKWISE"
-        else:
-            direction = "STOP"
 basic.forever(on_forever2)

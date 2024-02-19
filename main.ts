@@ -1,10 +1,42 @@
-let direction = ""
+function Update_Sensor () {
+    if (true) {
+        left_sensor = pins.digitalReadPin(DigitalPin.P0)
+        middle_sensor = pins.digitalReadPin(DigitalPin.P1)
+        right_sensor = pins.digitalReadPin(DigitalPin.P2)
+    } else {
+        left_sensor = pins.digitalReadPin(DigitalPin.P12)
+        middle_sensor = pins.digitalReadPin(DigitalPin.P1)
+        right_sensor = pins.digitalReadPin(DigitalPin.P13)
+    }
+}
+/**
+ * THICK / THIN
+ */
 let prev_direction = ""
 let start_time = 0
+let direction = ""
+let right_sensor = 0
+let middle_sensor = 0
+let left_sensor = 0
+let line_follower = true
+let line_size = "THICK"
 let speed_fast = 255
 let speed_slow = 100
 let speed_turn_offset = 50
 serial.redirectToUSB()
+basic.forever(function () {
+    if (line_follower) {
+        if (middle_sensor == 1) {
+            direction = "FORWARD"
+        } else if (right_sensor == 1) {
+            direction = "ROTATE_CLOCKWISE"
+        } else if (left_sensor == 1) {
+            direction = "ROTATE_COUNTERCLOCKWISE"
+        } else {
+            direction = "STOP"
+        }
+    }
+})
 basic.forever(function () {
     start_time = control.millis()
     if (prev_direction != direction) {
@@ -43,24 +75,8 @@ basic.forever(function () {
             motor.MotorRun(motor.Motors.M4, motor.Dir.CW, speed)
         } else if (direction == "STOP") {
             motor.motorStopAll()
-        } else if (direction == "\"HORN\"") {
-            music.play(music.tonePlayable(262, music.beat(BeatFraction.Breve)), music.PlaybackMode.InBackground)
         } else {
             motor.motorStopAll()
-        }
-    }
-})
-basic.forever(function () {
-    let line_follower = 0
-    if (line_follower) {
-        if (pins.digitalReadPin(DigitalPin.P1) == 1) {
-            direction = "FORWARD"
-        } else if (pins.digitalReadPin(DigitalPin.P2) == 1) {
-            direction = "ROTATE_CLOCKWISE"
-        } else if (pins.digitalReadPin(DigitalPin.P0) == 1) {
-            direction = "ROTATE_COUNTERCLOCKWISE"
-        } else {
-            direction = "STOP"
         }
     }
 })
