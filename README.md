@@ -27,8 +27,7 @@ To edit this repository in MakeCode.
 * D5 - Green - P0
 * Vcc - Red
 * Ground - Black
-* 
-### Infrared Sensor (Remote)
+ 
 ### Power
 ### Motor Wiring
 Connected to microbit 
