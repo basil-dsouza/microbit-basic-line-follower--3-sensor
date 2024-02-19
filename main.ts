@@ -24,6 +24,9 @@ let speed_fast = 255
 let speed_slow = 100
 let speed_turn_offset = 50
 serial.redirectToUSB()
+/**
+ * Use: FORWARD / REVERSE / TRAVERSE_LEFT / TRAVERSE_RIGHT / ROTATE_CLOCKWISE / ROTATE_COUNTERCLOCKWISE / STOP
+ */
 basic.forever(function () {
     if (line_follower) {
         if (middle_sensor == 1) {
@@ -37,6 +40,9 @@ basic.forever(function () {
         }
     }
 })
+/**
+ * Advanced - Can Ignore for now
+ */
 basic.forever(function () {
     start_time = control.millis()
     if (prev_direction != direction) {
